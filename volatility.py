@@ -33,34 +33,27 @@ def logReturnSD(close_prices):
     return historical_volatility
 
 
-def calc(days=1, resolution=5):
+def calc(days=1, resolution_hours=5):
     end_time = math.ceil(time.time() - 60)
     start_time = math.ceil(end_time) - days * 24 * 60 * 60
-    request_url = f"https://pyth-api.vintage-orange-muffin.com/v2/history?from={start_time}&to={end_time}&resolution={resolution}&symbol=ETH%2FUSD"
+    resolution_mins = resolution_hours * 60
+    request_url = f"https://pyth-api.vintage-orange-muffin.com/v2/history?from={start_time}&to={end_time}&resolution={resolution_mins}&symbol=ETH%2FUSD"
     r = requests.get(request_url)
-    prices = r.json()
-    if "c" in prices:
-        rawVolatility = returnSD(
-            [
-                float(i)
-                for i in "147.82,149.5,149.78,149.86,149.93,150.89,152.39,153.74,152.79,151.23,151.78".split(
-                    ","
-                )
-            ]
-        )
-        logVolatility = logReturnSD(
-            [
-                float(i)
-                for i in "147.82,149.5,149.78,149.86,149.93,150.89,152.39,153.74,152.79,151.23,151.78".split(
-                    ","
-                )
-            ]
-        )
-        print("Log Volatility: ", logVolatility)
+    response = r.json()
+    if "c" in response:
+        # prices = [
+        #     float(i)
+        #     for i in "147.82,149.5,149.78,149.86,149.93,150.89,152.39,153.74,152.79,151.23,151.78".split(
+        #         ","
+        #     )
+        # ]
+        prices = response["c"]
+        rawVolatility = returnSD(prices)
+        logVolatility = logReturnSD(prices)
+        print("Historical Volatility (time consistent): ", logVolatility)
         print("Historical Volatility:", rawVolatility)
     else:
-        print("error while fetching data ", prices,
-              " for request : ", request_url)
+        print("error while fetching data ", response, " for request : ", request_url)
 
 
-calc(1, 5)
+calc(20, 12)
