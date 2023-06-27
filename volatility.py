@@ -23,6 +23,7 @@ def returnSD(close_prices):
 
 
 def logReturnSD(close_prices):
+    # These are time consistent returns
     log_returns = [
         math.log(close_prices[i] / close_prices[i - 1])
         for i in range(1, len(close_prices))
@@ -50,7 +51,7 @@ def calc(days=1, resolution_hours=5):
         prices = response["c"]
         rawVolatility = returnSD(prices)
         logVolatility = logReturnSD(prices)
-        print("Historical Volatility (time consistent): ", logVolatility)
+        print("Historical Volatility (Log returns): ", logVolatility)
         print("Historical Volatility:", rawVolatility)
     else:
         print("error while fetching data ", response, " for request : ", request_url)
